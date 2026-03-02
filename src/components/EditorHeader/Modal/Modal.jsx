@@ -25,6 +25,7 @@ import {
 import CodeEditor from "../../CodeEditor";
 import ImportDiagram from "./ImportDiagram";
 import ImportSource from "./ImportSource";
+import ImportLiveDatabase from "./ImportLiveDatabase";
 import Language from "./Language";
 import New from "./New";
 import Open from "./Open";
@@ -67,6 +68,20 @@ export default function Modal({
     overwrite: false,
   });
   const [importData, setImportData] = useState(null);
+  const [importLive, setImportLive] = useState({
+    engine: "mysql",
+    host: "127.0.0.1",
+    port: "3306",
+    username: "",
+    password: "",
+    connectionString: "",
+    databases: [],
+    selectedDatabase: "",
+    overwrite: true,
+    loadingDatabases: false,
+    loadingSchema: false,
+    warnings: [],
+  });
   const [error, setError] = useState({
     type: STATUS.NONE,
     message: "",
@@ -158,6 +173,38 @@ export default function Modal({
     }
   };
 
+  const applyDiagramData = (diagramData, overwrite = true) => {
+    if (!diagramData) return;
+
+    if (overwrite) {
+      setTables(diagramData.tables ?? []);
+      setRelationships(diagramData.relationships ?? []);
+      if (databases[database].hasTypes) setTypes(diagramData.types ?? []);
+      if (databases[database].hasEnums) setEnums(diagramData.enums ?? []);
+      setTransform((prev) => ({ ...prev, pan: { x: 0, y: 0 } }));
+      setNotes([]);
+      setAreas([]);
+    } else {
+      setTables((prev) => [...prev, ...(diagramData.tables ?? [])]);
+      setRelationships((prev) =>
+        [...prev, ...(diagramData.relationships ?? [])].map((r, i) => ({
+          ...r,
+          id: i,
+        })),
+      );
+      if (databases[database].hasTypes && (diagramData.types ?? []).length) {
+        setTypes((prev) => [...prev, ...(diagramData.types ?? [])]);
+      }
+      if (databases[database].hasEnums && (diagramData.enums ?? []).length) {
+        setEnums((prev) => [...prev, ...(diagramData.enums ?? [])]);
+      }
+    }
+
+    setUndoStack([]);
+    setRedoStack([]);
+    setModal(MODAL.NONE);
+  };
+
   const getModalOnOk = async () => {
     switch (modal) {
       case MODAL.IMG:
@@ -185,6 +232,9 @@ export default function Modal({
         return;
       case MODAL.IMPORT_SRC:
         parseSQLAndLoadDiagram();
+        return;
+      case MODAL.IMPORT_DB:
+        applyDiagramData(importData, importLive.overwrite);
         return;
       case MODAL.OPEN:
         if (!selectedDiagramId) return;
@@ -231,6 +281,16 @@ export default function Modal({
             setImportData={setImportSource}
             error={error}
             setError={setError}
+          />
+        );
+      case MODAL.IMPORT_DB:
+        return (
+          <ImportLiveDatabase
+            importData={importLive}
+            setImportData={setImportLive}
+            error={error}
+            setError={setError}
+            setDiagramData={setImportData}
           />
         );
       case MODAL.NEW:
@@ -331,6 +391,20 @@ export default function Modal({
           src: "",
           overwrite: false,
         });
+        setImportLive({
+          engine: "mysql",
+          host: "127.0.0.1",
+          port: "3306",
+          username: "",
+          password: "",
+          connectionString: "",
+          databases: [],
+          selectedDatabase: "",
+          overwrite: true,
+          loadingDatabases: false,
+          loadingSchema: false,
+          warnings: [],
+        });
       }}
       onCancel={() => {
         if (modal === MODAL.RENAME) setUncontrolledTitle(title);
@@ -348,7 +422,8 @@ export default function Modal({
           (modal === MODAL.RENAME && title === "") ||
           ((modal === MODAL.IMG || modal === MODAL.CODE) && !exportData.data) ||
           (modal === MODAL.SAVEAS && saveAsTitle === "") ||
-          (modal === MODAL.IMPORT_SRC && importSource.src === ""),
+          (modal === MODAL.IMPORT_SRC && importSource.src === "") ||
+          (modal === MODAL.IMPORT_DB && !importData),
         hidden: modal === MODAL.SHARE,
       }}
       hasCancel={modal !== MODAL.SHARE}

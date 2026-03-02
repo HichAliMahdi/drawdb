@@ -29,6 +29,7 @@ const en = {
     oops_smth_went_wrong: "Oops! Something went wrong.",
     import_diagram: "Import diagram",
     import_from_source: "Import from SQL",
+    import_from_database: "Import from Database",
     export_as: "Export as",
     export_source: "Export SQL",
     models: "Models",
@@ -167,6 +168,19 @@ const en = {
     drag_and_drop_files: "Drag and drop the file here or click to upload.",
     upload_sql_to_generate_diagrams:
       "Upload an sql file to autogenerate your tables and columns.",
+    database_engine: "Database engine",
+    host: "Host",
+    port: "Port",
+    username: "Username",
+    password: "Password",
+    connection_string_optional: "Connection string (optional)",
+    load_databases: "Load databases",
+    select_database: "Select database",
+    inspect_database: "Inspect database",
+    database_list_loaded: "Databases loaded. Select one and inspect it.",
+    database_schema_loaded:
+      "Database schema loaded. Click Import to generate the architecture.",
+    no_database_found: "No database found with the provided connection.",
     overwrite_existing_diagram: "Overwrite existing diagram",
     only_mysql_supported:
       "*For the time being loading only MySQL scripts is supported.",

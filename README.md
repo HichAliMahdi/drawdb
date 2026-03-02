@@ -48,6 +48,16 @@ npm install
 npm run dev
 ```
 
+### Live database import (MySQL, PostgreSQL, MongoDB)
+
+To use the new "Import from Database" feature locally, run the introspection service in a second terminal:
+
+```bash
+npm run dev:db
+```
+
+By default, the UI calls `http://localhost:8787` through the Vite `/db-introspect` proxy. You can override this with `VITE_DB_CONNECTOR_URL`.
+
 ### Build
 
 ```bash

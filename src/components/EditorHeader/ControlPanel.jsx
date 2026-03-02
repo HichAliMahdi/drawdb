@@ -940,6 +940,12 @@ export default function ControlPanel({ title, setTitle, lastSaved }) {
         },
         disabled: layout.readOnly,
       },
+      import_from_database: {
+        function: () => {
+          setModal(MODAL.IMPORT_DB);
+        },
+        disabled: layout.readOnly,
+      },
       export_source: {
         ...(database === DB.GENERIC && {
           children: [

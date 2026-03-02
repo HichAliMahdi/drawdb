@@ -87,6 +87,7 @@ export const MODAL = {
   TABLE_WIDTH: 9,
   LANGUAGE: 10,
   SHARE: 11,
+  IMPORT_DB: 12,
 };
 
 export const STATUS = {
